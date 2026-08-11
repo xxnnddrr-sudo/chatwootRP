@@ -110,8 +110,8 @@
   enabled: false
 - name: audit_logs
   display_name: Audit Logs
-  enabled: false
-  premium: true
+  enabled: true
+  premium: false
 - name: custom_tools
   display_name: Custom Tools
   enabled: false
@@ -146,15 +146,15 @@
   premium: true
 - name: custom_roles
   display_name: Custom Roles
-  enabled: false
-  premium: true
+  enabled: true
+  premium: false
 - name: chatwoot_v4
   display_name: Chatwoot V4
   enabled: true
 - name: captain_v1_action_classifier
   display_name: Captain V1 Action Classifier
-  enabled: false
-  premium: true
+  enabled: true
+  premium: false
   chatwoot_internal: true
 - name: contact_chatwoot_support_team
   display_name: Contact Chatwoot Support Team

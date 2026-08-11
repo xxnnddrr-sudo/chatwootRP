@@ -14,7 +14,17 @@ class ConversationPolicy < ApplicationPolicy
   private
 
   def agent_can_view_conversation?
-    inbox_access? || team_access?
+    # Allow if assigned to the current user
+    return true if assigned_to_user?
+
+    # Allow if the agent is a participant/collaborator
+    return true if participant?
+
+    # Allow unassigned conversations (so agents can pick them up)
+    return true if record.assignee_id.blank? && inbox_access?
+
+    # Everything else (assigned to someone else) → deny
+    false
   end
 
   def administrator?
@@ -31,7 +41,6 @@ class ConversationPolicy < ApplicationPolicy
 
   def team_access?
     return false if record.team_id.blank?
-
     user.teams.where(account_id: account&.id).exists?(id: record.team_id)
   end
 
