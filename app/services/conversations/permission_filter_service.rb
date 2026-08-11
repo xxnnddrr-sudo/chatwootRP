@@ -17,23 +17,30 @@ class Conversations::PermissionFilterService
   private
 
   def accessible_conversations
-    # Agents only see:
-    # 1. Conversations assigned to them
-    # 2. Unassigned conversations in their inboxes
-    # 3. Conversations where they are a participant
+  # Agents only see:
+  # 1. Conversations assigned to them
+  # 2. Unassigned conversations in their inboxes
+  # 3. Conversations where they are a participant
 
-    assigned_to_me = conversations.where(assignee_id: user.id)
+  my_inbox_ids = user.inboxes.where(account_id: account.id).select(:id)
 
-    unassigned_in_my_inboxes = conversations
-      .where(assignee_id: nil)
-      .where(inbox_id: user.inboxes.where(account_id: account.id).select(:id))
+  assigned_to_me = conversations.where(assignee_id: user.id)
 
-    participating = conversations
-      .joins(:conversation_participants)
-      .where(conversation_participants: { user_id: user.id })
+  unassigned_in_my_inboxes = conversations
+    .where(assignee_id: nil)
+    .where(inbox_id: my_inbox_ids)
 
-    assigned_to_me.or(unassigned_in_my_inboxes).or(participating).distinct
-  end
+  participating_ids = ConversationParticipant
+    .where(user_id: user.id)
+    .select(:conversation_id)
+
+  participating = conversations.where(id: participating_ids)
+
+  assigned_to_me
+    .or(unassigned_in_my_inboxes)
+    .or(participating)
+    .distinct
+end
 
   def account_user
     AccountUser.find_by(account_id: account.id, user_id: user.id)
