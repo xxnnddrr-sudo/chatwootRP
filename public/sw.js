@@ -25,11 +25,13 @@ self.addEventListener('push', event => {
   }
 
   const options = {
-    body: notification.body || '',
-    tag: notification.tag || 'chatwoot',
+   body: notification.body || notification.title || 'New message',
+    tag: notification.tag || 'chatwoot-' + Date.now(),
     icon: notification.icon || '/favicon.ico',
     badge: notification.badge || '/favicon.ico',
     data: { url: notification.url || '/' },
+    requireInteraction: true,
+    silent: false
   };
 
   event.waitUntil(
