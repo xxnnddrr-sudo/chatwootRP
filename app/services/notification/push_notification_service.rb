@@ -32,10 +32,12 @@ class Notification::PushNotificationService
 
   def push_message
     {
-      title: notification.push_message_title,
-      tag: "#{notification.notification_type}_#{conversation.display_id}_#{notification.id}",
-      url: push_url
-    }
+    title: notification.push_message_title,
+    body: notification.try(:push_message_body).presence || notification.push_message_title,
+    tag: "#{notification.notification_type}_#{conversation.display_id}_#{notification.id}",
+    url: push_url,
+    icon: '/favicon.ico'
+  }
   end
 
   def push_url
