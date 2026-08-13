@@ -1,71 +1,74 @@
 /* eslint-disable no-restricted-globals, no-console */
 /* globals clients */
 
+const ORIGIN = self.location.origin;
+
+self.addEventListener('install', event => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(clients.claim());
+});
+
 self.addEventListener('push', event => {
-  let notification = {
-    title: 'Chatwoot',
-    body: 'New notification',
-    url: '/',
-  };
+  event.waitUntil(handlePush(event));
+});
+
+async function handlePush(event) {
+  let title = 'Chatwoot';
+  let body = 'New notification';
+  let url = ORIGIN + '/';
 
   try {
     if (event.data) {
       try {
         const data = event.data.json();
-        notification = { ...notification, ...data };
+        title = data.title || title;
+        body = data.body || data.title || body;
+        url = data.url || url;
+        if (url && url.startsWith('/')) url = ORIGIN + url;
       } catch (e) {
         const text = event.data.text();
-        notification.title = text || 'Chatwoot';
-        notification.body = text || 'New notification';
+        title = text || title;
+        body = text || body;
       }
     }
   } catch (e) {
-    console.error('Failed to parse push data', e);
+    console.error('push parse error', e);
   }
 
-  const title = notification.title || 'Chatwoot';
-  const body =
-    notification.body ||
-    notification.title ||
-    'New notification';
-
-  const options = {
-    body: body,
-    icon: notification.icon || '/favicon.ico',
-    badge: notification.badge || '/favicon.ico',
-    data: {
-      url: notification.url || '/',
-    },
-    requireInteraction: true,
-    silent: false,
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
-});
+  try {
+    await self.registration.showNotification(title, {
+      body: body,
+      icon: ORIGIN + '/favicon.ico',
+      badge: ORIGIN + '/favicon.ico',
+      data: { url: url },
+      requireInteraction: true,
+      silent: false,
+    });
+  } catch (e) {
+    console.error('showNotification failed', e);
+    // last resort
+    await self.registration.showNotification('Chatwoot', {
+      body: body || 'New notification',
+      requireInteraction: true,
+    });
+  }
+}
 
 self.addEventListener('notificationclick', event => {
   const url =
-    (event.notification.data && event.notification.data.url) || '/';
-
+    (event.notification.data && event.notification.data.url) || ORIGIN + '/';
   event.notification.close();
 
   event.waitUntil(
     clients
       .matchAll({ type: 'window', includeUncontrolled: true })
-      .then(windowClients => {
-        const match = windowClients.find(
-          client => client.url === url || client.url.includes(url)
-        );
-
-        if (match && 'focus' in match) {
-          return match.focus();
-        }
-
-        if (clients.openWindow) {
-          return clients.openWindow(url);
-        }
+      .then(list => {
+        const match = list.find(c => c.url === url || c.url.startsWith(url));
+        if (match && match.focus) return match.focus();
+        if (clients.openWindow) return clients.openWindow(url);
       })
   );
 });
