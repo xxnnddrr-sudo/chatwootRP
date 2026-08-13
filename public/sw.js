@@ -26,12 +26,11 @@ self.addEventListener('push', event => {
 
   const options = {
    body: notification.body || notification.title || 'New message',
-    tag: notification.tag || 'chatwoot-' + Date.now(),
-    icon: notification.icon || '/favicon.ico',
-    badge: notification.badge || '/favicon.ico',
-    data: { url: notification.url || '/' },
-    requireInteraction: true,
-    silent: false
+  // omit tag temporarily so Windows doesn't replace a previous toast
+  icon: notification.icon || '/favicon.ico',
+  data: { url: notification.url || '/' },
+  requireInteraction: true,
+  silent: false
   };
 
   event.waitUntil(
