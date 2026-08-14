@@ -52,7 +52,6 @@ export default {
 </script>
 
 <template>
-  <template>
-  <div v-if="false" />
-</div>
+<!-- Branding completely removed -->
+  <div class="p-3" />
 </template>
