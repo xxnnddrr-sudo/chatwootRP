@@ -28,6 +28,9 @@ const alertTones = computed(() => [
     value: 'bell',
     label: 'Bell',
   },
+  { value: 'blitzkrieg',
+  label: 'blitzkrieg' 
+  },
   {
     value: 'chime',
     label: 'Chime',
