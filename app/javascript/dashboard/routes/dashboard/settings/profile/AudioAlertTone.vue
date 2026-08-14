@@ -9,7 +9,7 @@ const props = defineProps({
     type: String,
     required: true,
     validator: value =>
-      ['ding', 'bell', 'chime', 'magic', 'ping'].includes(value),
+      ['ding', 'bell', 'chime', 'magic', 'ping', 'blitzkrieg', 'amber', 'f1'].includes(value),
   },
   label: {
     type: String,
@@ -20,29 +20,14 @@ const props = defineProps({
 const emit = defineEmits(['change']);
 
 const alertTones = computed(() => [
-  {
-    value: 'ding',
-    label: 'Ding',
-  },
-  {
-    value: 'bell',
-    label: 'Bell',
-  },
-  { value: 'blitzkrieg',
-  label: 'blitzkrieg' 
-  },
-  {
-    value: 'chime',
-    label: 'Chime',
-  },
-  {
-    value: 'magic',
-    label: 'Magic',
-  },
-  {
-    value: 'ping',
-    label: 'Ping',
-  },
+  { value: 'ding', label: 'Ding' },
+  { value: 'bell', label: 'Bell' },
+  { value: 'chime', label: 'Chime' },
+  { value: 'magic', label: 'Magic' },
+  { value: 'ping', label: 'Ping' },
+  { value: 'blitzkrieg', label: 'Blitzkrieg' },
+  { value: 'amber', label: 'Amber' },
+  { value: 'f1', label: 'F1' },
 ]);
 
 const selectedValue = computed({
@@ -53,10 +38,8 @@ const selectedValue = computed({
 });
 
 const audio = new Audio();
-
 const playAudio = async () => {
   try {
-    // Has great support https://caniuse.com/mdn-api_htmlaudioelement
     audio.src = `/audio/dashboard/${selectedValue.value}.mp3`;
     await audio.play();
   } catch (error) {
@@ -64,35 +47,3 @@ const playAudio = async () => {
   }
 };
 </script>
-
-<template>
-  <div class="flex items-center gap-2">
-    <FormSelect
-      v-model="selectedValue"
-      name="alertTone"
-      spacing="compact"
-      class="flex-grow"
-      :value="selectedValue"
-      :options="alertTones"
-      :label="label"
-    >
-      <option
-        v-for="tone in alertTones"
-        :key="tone.label"
-        :value="tone.value"
-        :selected="tone.value === selectedValue"
-      >
-        {{ tone.label }}
-      </option>
-    </FormSelect>
-    <button
-      v-tooltip.top="
-        $t('PROFILE_SETTINGS.FORM.AUDIO_NOTIFICATIONS_SECTION.PLAY')
-      "
-      class="border-0 shadow-sm outline-none flex justify-center items-center size-10 appearance-none rounded-xl ring-n-weak ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-n-brand flex-shrink-0 mt-[1.75rem]"
-      @click="playAudio"
-    >
-      <Icon icon="i-lucide-volume-2" />
-    </button>
-  </div>
-</template>
