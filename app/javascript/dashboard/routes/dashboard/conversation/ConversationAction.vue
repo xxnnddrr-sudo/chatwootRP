@@ -89,13 +89,19 @@ export default {
           }
         );
       },
-      set(agent) {
-        const agentId = agent ? agent.id : null;
-        const assigneeType = agent ? agent.assignee_type || 'User' : null;
-        this.$store.dispatch('setCurrentChatAssignee', {
-          conversationId: this.currentChat.id,
-          assignee: agent,
-          assigneeType,
+      set(agent) {const agentName = agent ? agent.name : 'Unassigned';
+
+  // Confirmation before assigning
+  if (!confirm(`Are you sure you want to assign this conversation to ${agentName}?`)) {
+    return; // Cancel the assignment
+  }
+
+  const agentId = agent ? agent.id : null;
+  this.$store.dispatch('setCurrentChatAssignee', agent);
+  this.$store.dispatch('assignAgent', {
+    conversationId: this.currentChat.id,
+    agentId,
+  });
         });
         this.$store
           .dispatch('assignAgent', {
