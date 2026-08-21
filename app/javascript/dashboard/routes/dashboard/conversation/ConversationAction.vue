@@ -89,11 +89,12 @@ export default {
           }
         );
       },
-      set(agent) {const agentName = agent ? agent.name : 'Unassigned';
+      set(agent) {
+        const agentName = agent ? agent.name : 'Unassigned';
 
   // Confirmation before assigning
   if (!confirm(`Are you sure you want to assign this conversation to ${agentName}?`)) {
-    return; // Cancel the assignment
+    return;
   }
 
   const agentId = agent ? agent.id : null;
