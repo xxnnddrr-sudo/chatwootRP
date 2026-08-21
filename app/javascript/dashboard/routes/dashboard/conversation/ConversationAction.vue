@@ -62,117 +62,116 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({
-      currentChat: 'getSelectedChat',
-      currentUser: 'getCurrentUser',
-      teams: 'teams/getTeams',
-    }),
-    hasAnAssignedTeam() {
-      return !!this.currentChat?.meta?.team;
-    },
-    teamsList() {
-      if (this.hasAnAssignedTeam) {
-        return [
-          { id: 0, name: this.$t('TEAMS_SETTINGS.LIST.NONE') },
-          ...this.teams,
-        ];
-      }
-      return this.teams;
-    },
-    assignedAgent: {
-  get() {
-    const assignee = this.currentChat.meta.assignee;
-    return (
-      assignee && {
-        ...assignee,
-        assignee_type: this.currentChat.meta.assignee_type || 'User',
-      }
-    );
+  ...mapGetters({
+    currentChat: 'getSelectedChat',
+    currentUser: 'getCurrentUser',
+    teams: 'teams/getTeams',
+  }),
+  hasAnAssignedTeam() {
+    return !!this.currentChat?.meta?.team;
   },
-  set(agent) {
-    const agentName = agent ? agent.name : 'Unassigned';
-
-  // Confirmation before assigning
-  if (!confirm(`Are you sure you want to assign this conversation to ${agentName}?`)) {
-    return;
-  }
-
-  const agentId = agent ? agent.id : null;
-  const assigneeType = agent?.assignee_type || 'User';
-
-  this.$store.dispatch('setCurrentChatAssignee', agent);
-  this.$store
-    .dispatch('assignAgent', {
-      conversationId: this.currentChat.id,
-      agentId,
-      assigneeType,
-    })
-    .then(() => {
-      useAlert(this.$t('CONVERSATION.CHANGE_AGENT'));
-    });
-},
-    assignedTeam: {
-      get() {
-        return this.currentChat.meta.team;
-      },
-      set(team) {
-        const conversationId = this.currentChat.id;
-        const teamId = team ? team.id : 0;
-        this.$store.dispatch('setCurrentChatTeam', { team, conversationId });
-        this.$store
-          .dispatch('assignTeam', { conversationId, teamId })
-          .then(() => {
-            useAlert(this.$t('CONVERSATION.CHANGE_TEAM'));
-          });
-      },
+  teamsList() {
+    if (this.hasAnAssignedTeam) {
+      return [
+        { id: 0, name: this.$t('TEAMS_SETTINGS.LIST.NONE') },
+        ...this.teams,
+      ];
+    }
+    return this.teams;
+  },
+  assignedAgent: {
+    get() {
+      const assignee = this.currentChat.meta.assignee;
+      return (
+        assignee && {
+          ...assignee,
+          assignee_type: this.currentChat.meta.assignee_type || 'User',
+        }
+      );
     },
-    assignedPriority: {
-      get() {
-        const selectedOption = this.priorityOptions.find(
-          opt => opt.id === this.currentChat.priority
-        );
+    set(agent) {
+      const agentName = agent ? agent.name : 'Unassigned';
 
-        return selectedOption || this.priorityOptions[0];
-      },
-      set(priorityItem) {
-        const conversationId = this.currentChat.id;
-        const oldValue = this.currentChat?.priority;
-        const priority = priorityItem.id;
+      // Confirmation before assigning
+      if (!confirm(`Are you sure you want to assign this conversation to ${agentName}?`)) {
+        return;
+      }
 
-        this.$store.dispatch('setCurrentChatPriority', {
-          priority,
-          conversationId,
+      const agentId = agent ? agent.id : null;
+      const assigneeType = agent?.assignee_type || 'User';
+
+      this.$store.dispatch('setCurrentChatAssignee', agent);
+      this.$store
+        .dispatch('assignAgent', {
+          conversationId: this.currentChat.id,
+          agentId,
+          assigneeType,
+        })
+        .then(() => {
+          useAlert(this.$t('CONVERSATION.CHANGE_AGENT'));
         });
-        this.$store
-          .dispatch('assignPriority', { conversationId, priority })
-          .then(() => {
-            useTrack(CONVERSATION_EVENTS.CHANGE_PRIORITY, {
-              oldValue,
-              newValue: priority,
-              from: 'Conversation Sidebar',
-            });
-            useAlert(
-              this.$t('CONVERSATION.PRIORITY.CHANGE_PRIORITY.SUCCESSFUL', {
-                priority: priorityItem.name,
-                conversationId,
-              })
-            );
-          });
-      },
-    },
-    showSelfAssign() {
-      if (!this.assignedAgent) {
-        return true;
-      }
-      if (
-        this.assignedAgent.id !== this.currentUser.id ||
-        (this.assignedAgent.assignee_type || 'User') !== 'User'
-      ) {
-        return true;
-      }
-      return false;
     },
   },
+  assignedTeam: {
+    get() {
+      return this.currentChat.meta.team;
+    },
+    set(team) {
+      const conversationId = this.currentChat.id;
+      const teamId = team ? team.id : 0;
+      this.$store.dispatch('setCurrentChatTeam', { team, conversationId });
+      this.$store
+        .dispatch('assignTeam', { conversationId, teamId })
+        .then(() => {
+          useAlert(this.$t('CONVERSATION.CHANGE_TEAM'));
+        });
+    },
+  },
+  assignedPriority: {
+    get() {
+      const selectedOption = this.priorityOptions.find(
+        opt => opt.id === this.currentChat.priority
+      );
+      return selectedOption || this.priorityOptions[0];
+    },
+    set(priorityItem) {
+      const conversationId = this.currentChat.id;
+      const oldValue = this.currentChat?.priority;
+      const priority = priorityItem.id;
+      this.$store.dispatch('setCurrentChatPriority', {
+        priority,
+        conversationId,
+      });
+      this.$store
+        .dispatch('assignPriority', { conversationId, priority })
+        .then(() => {
+          useTrack(CONVERSATION_EVENTS.CHANGE_PRIORITY, {
+            oldValue,
+            newValue: priority,
+            from: 'Conversation Sidebar',
+          });
+          useAlert(
+            this.$t('CONVERSATION.PRIORITY.CHANGE_PRIORITY.SUCCESSFUL', {
+              priority: priorityItem.name,
+              conversationId,
+            })
+          );
+        });
+    },
+  },
+  showSelfAssign() {
+    if (!this.assignedAgent) {
+      return true;
+    }
+    if (
+      this.assignedAgent.id !== this.currentUser.id ||
+      (this.assignedAgent.assignee_type || 'User') !== 'User'
+    ) {
+      return true;
+    }
+    return false;
+  },
+},
   methods: {
     onSelfAssign() {
       const {
