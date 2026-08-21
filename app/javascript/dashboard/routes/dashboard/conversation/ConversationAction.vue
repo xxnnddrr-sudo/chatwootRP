@@ -92,25 +92,24 @@ export default {
   set(agent) {
     const agentName = agent ? agent.name : 'Unassigned';
 
-    // Confirmation before assigning
-    if (!confirm(`Are you sure you want to assign this conversation to ${agentName}?`)) {
-      return;
-    }
+  // Confirmation before assigning
+  if (!confirm(`Are you sure you want to assign this conversation to ${agentName}?`)) {
+    return;
+  }
 
-    const agentId = agent ? agent.id : null;
-    const assigneeType = agent?.assignee_type || 'User';
+  const agentId = agent ? agent.id : null;
+  const assigneeType = agent?.assignee_type || 'User';
 
-    this.$store.dispatch('setCurrentChatAssignee', agent);
-    this.$store
-      .dispatch('assignAgent', {
-        conversationId: this.currentChat.id,
-        agentId,
-        assigneeType,
-      })
-      .then(() => {
-        useAlert(this.$t('CONVERSATION.CHANGE_AGENT'));
-      });
-  },
+  this.$store.dispatch('setCurrentChatAssignee', agent);
+  this.$store
+    .dispatch('assignAgent', {
+      conversationId: this.currentChat.id,
+      agentId,
+      assigneeType,
+    })
+    .then(() => {
+      useAlert(this.$t('CONVERSATION.CHANGE_AGENT'));
+    });
 },
     assignedTeam: {
       get() {
