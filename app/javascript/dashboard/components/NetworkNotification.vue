@@ -56,6 +56,10 @@ const isInAnyOfTheRoutes = routeName => {
 const updateWebsocketStatus = () => {
   isDisconnected.value = true;
   showNotification.value = true;
+  // Auto refresh the page when websocket disconnects
+  setTimeout(() => {
+    window.location.reload();
+  }, 1000);
 };
 
 const handleReconnectionCompleted = () => {
