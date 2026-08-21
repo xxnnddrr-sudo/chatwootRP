@@ -79,29 +79,37 @@ export default {
       }
       return this.teams;
     },
-    assignedAgent: {
-      get() {
-        const assignee = this.currentChat.meta.assignee;
-        return (
-          assignee && {
-            ...assignee,
-            assignee_type: this.currentChat.meta.assignee_type || 'User',
-          }
-        );
-      },
+    assignedAgent: {get() {
+    const assignee = this.currentChat.meta.assignee;
+    return (
+      assignee && {
+        ...assignee,
+        assignee_type: this.currentChat.meta.assignee_type || 'User',
+      }
+    );
+  },
       set(agent) {
         const agentName = agent ? agent.name : 'Unassigned';
 
-  // Confirmation before assigning
-  if (!confirm(`Are you sure you want to assign this conversation to ${agentName}?`)) {
-    return;
-  }
+    // Confirmation before assigning
+    if (!confirm(`Are you sure you want to assign this conversation to ${agentName}?`)) {
+      return;
+    }
 
-  const agentId = agent ? agent.id : null;
-  this.$store.dispatch('setCurrentChatAssignee', agent);
-  this.$store.dispatch('assignAgent', {
-    conversationId: this.currentChat.id,
-    agentId,
+    const agentId = agent ? agent.id : null;
+    const assigneeType = agent?.assignee_type || 'User';
+
+    this.$store.dispatch('setCurrentChatAssignee', agent);
+    this.$store
+      .dispatch('assignAgent', {
+        conversationId: this.currentChat.id,
+        agentId,
+        assigneeType,
+      })
+      .then(() => {
+        useAlert(this.$t('CONVERSATION.CHANGE_AGENT'));
+      });
+  },
   });
         });
         this.$store
