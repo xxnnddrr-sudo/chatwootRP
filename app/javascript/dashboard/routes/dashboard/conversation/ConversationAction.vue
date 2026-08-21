@@ -79,7 +79,8 @@ export default {
       }
       return this.teams;
     },
-    assignedAgent: {get() {
+    assignedAgent: {
+  get() {
     const assignee = this.currentChat.meta.assignee;
     return (
       assignee && {
@@ -88,8 +89,8 @@ export default {
       }
     );
   },
-      set(agent) {
-        const agentName = agent ? agent.name : 'Unassigned';
+  set(agent) {
+    const agentName = agent ? agent.name : 'Unassigned';
 
     // Confirmation before assigning
     if (!confirm(`Are you sure you want to assign this conversation to ${agentName}?`)) {
@@ -110,19 +111,7 @@ export default {
         useAlert(this.$t('CONVERSATION.CHANGE_AGENT'));
       });
   },
-  });
-        });
-        this.$store
-          .dispatch('assignAgent', {
-            conversationId: this.currentChat.id,
-            agentId,
-            assigneeType,
-          })
-          .then(() => {
-            useAlert(this.$t('CONVERSATION.CHANGE_AGENT'));
-          });
-      },
-    },
+},
     assignedTeam: {
       get() {
         return this.currentChat.meta.team;
